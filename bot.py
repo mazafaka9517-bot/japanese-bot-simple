@@ -2,6 +2,7 @@
 import logging
 import sqlite3
 import random
+import os  # <-- ВАЖНО: этот импорт добавлен
 from datetime import datetime
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes, MessageHandler, filters
@@ -251,14 +252,17 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         """
         await query.edit_message_text(text=help_text, parse_mode='Markdown')
 
-# --- 7. ЗАПУСК БОТА ---
+# --- 7. ЗАПУСК БОТА (ИСПРАВЛЕННАЯ ЧАСТЬ) ---
 def main():
     """Запускает бота"""
-    # ВАЖНО: Токен от @BotFather нужно будет вставить НА ХОСТИНГЕ, в переменную окружения 'BOT_TOKEN'
-    # Сейчас здесь стоит заглушка. На Render.com вы создадите переменную BOT_TOKEN со своим настоящим токеном.
+    # ВАЖНО: Токен берётся ИЗ ПЕРЕМЕННОЙ ОКРУЖЕНИЯ
+    TOKEN = os.environ.get('BOT_TOKEN')  # Берем токен из переменной окружения
     
-    # Замените 'YOUR_BOT_TOKEN' на переменную окружения
-    TOKEN = 'YOUR_BOT_TOKEN'  # Это заглушка! На Render.com заменится на os.environ['BOT_TOKEN']
+    # Если токен не установлен — выводим ошибку и завершаем работу
+    if not TOKEN:
+        logger.error("❌ ОШИБКА: Переменная окружения BOT_TOKEN не установлена!")
+        print("❌ ОШИБКА: Переменная окружения BOT_TOKEN не установлена!")
+        exit(1)
     
     # Создаем приложение
     application = Application.builder().token(TOKEN).build()
